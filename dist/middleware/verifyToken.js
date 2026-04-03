@@ -1,0 +1,64 @@
+import { createAccessTokenWithRole, createRefreshToken } from "../utils/tokengenerator.js";
+import { redisClient } from "../utils/redisClient.js";
+import { verifyRefreshToken } from "../utils/tokengenerator.js";
+import { HTTP_STATUS } from "../constants/index.js";
+import jwt from "jsonwebtoken";
+export const verifyToken = (req, res, next) => {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader?.split(" ")[1];
+    if (!token) {
+        res.status(HTTP_STATUS.UNAUTHORIZED).json({ error: "Token missing" });
+        return;
+    }
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
+        if (err) {
+            res.status(HTTP_STATUS.FORBIDDEN).json({ error: "Invalid or expired token" });
+            return;
+        }
+        req.userId = payload.userId;
+        next();
+    });
+};
+export const refreshAccessToken = async (req, res) => {
+    try {
+        const token = req.cookies?.refreshToken;
+        const sessionId = req.cookies?.sessionId;
+        if (!token || !sessionId) {
+            res.status(HTTP_STATUS.UNAUTHORIZED).json({ message: "No token or session" });
+            return;
+        }
+        const payload = await verifyRefreshToken(token);
+        if (!payload || payload.sessionId !== sessionId) {
+            res.status(HTTP_STATUS.FORBIDDEN).json({ message: "Invalid token or session" });
+            return;
+        }
+        // Delete old refresh token
+        await redisClient.del(`refreshToken:${payload.userId}:${sessionId}`);
+        // Create new tokens with role information
+        const newAccessToken = await createAccessTokenWithRole(payload.userId);
+        const { token: newRefreshToken, sessionId: newSessionId } = await createRefreshToken(payload.userId);
+        res
+            .cookie("refreshToken", newRefreshToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 10 * 24 * 60 * 60 * 1000,
+            path: "/",
+        })
+            .cookie("sessionId", newSessionId, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 10 * 24 * 60 * 60 * 1000,
+            path: "/",
+        })
+            .json({
+            accessToken: newAccessToken,
+            message: "Access token refreshed successfully",
+        });
+    }
+    catch (err) {
+        console.error("Refresh token error:", err);
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Failed to refresh token" });
+    }
+};
