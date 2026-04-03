@@ -83,13 +83,6 @@ Server runs on `http://localhost:5000`
 
 ---
 
-## 📖 Documentation
-
-- **[API Documentation](./API_DOCUMENTATION.md)** - Complete endpoint reference
-- **[Environment Setup](./.env.example)** - Configuration options
-- **[Architecture](#-architecture)** - System design and structure
-
----
 
 ## 🗂️ Project Structure
 
@@ -256,7 +249,7 @@ curl -X GET "http://localhost:5000/api/records?page=1&limit=10&type=expense&cate
 
 ### Development Setup
 ```env
-NODE_ENV=development
+
 MONGODB_URI=mongodb://localhost:27017/financial-management
 ACCESS_TOKEN_SECRET=dev_secret_key
 REFRESH_TOKEN_SECRET=dev_refresh_secret
@@ -265,7 +258,7 @@ FRONTEND_URL=http://localhost:3000
 
 ### Production Setup
 ```env
-NODE_ENV=production
+
 MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/financial-management
 ACCESS_TOKEN_SECRET=<generate_with_: openssl rand -base64 32>
 REFRESH_TOKEN_SECRET=<generate_with_: openssl rand -base64 32>
@@ -372,32 +365,8 @@ When user role changes (via admin), existing tokens remain valid until expiry. T
 
 ---
 
-## 🚀 Deployment
 
-### Deploy to Vercel (Node.js)
-```bash
-npm i -g vercel
-vercel
-# Follow prompts, set environment variables in dashboard
-```
 
-### Deploy to Heroku
-```bash
-heroku login
-heroku create your-app-name
-git push heroku main
-heroku config:set $(cat .env | tr '\n' ' ')
-```
-
-### Deploy to Railway
-```bash
-npm i -g railway
-railway login
-railway init
-railway up
-```
-
----
 
 ## 📜 License
 
@@ -405,22 +374,12 @@ Private Project - For authorized use only
 
 ---
 
-## 👨‍💼 Support
 
-For technical issues or feature requests, refer to the comprehensive API documentation in `API_DOCUMENTATION.md`.
+Author 
 
----
+MITANSHU AGRAWAL
 
-## 🎯 Key Achievements
+@mitanshu-agr711
+@linkdin -> https://www.linkedin.com/in/mitanshuagrawal/
 
-✅ Complete RBAC implementation  
-✅ Production-ready authentication  
-✅ Comprehensive data aggregation  
-✅ Advanced filtering & pagination  
-✅ Soft delete with audit trail  
-✅ Full input validation  
-✅ Rate limiting & security  
-✅ Proper error handling  
-✅ Scalable architecture  
-✅ Production deployment ready  
-
+@copyright2026
