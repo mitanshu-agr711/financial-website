@@ -1,0 +1,32 @@
+import { Router } from "express";
+import {
+  register,
+  login,
+  logout,
+  adminCreateUser,
+  adminGetAllUsers,
+  adminGetUserById,
+  adminUpdateUserRole,
+  adminUpdateUserStatus,
+  adminDeleteUser,
+} from "../controller/auth.controller.js";
+import { verifyToken, onlyAdmin } from "../middleware/authMiddleware.js";
+import { refreshAccessToken } from "../middleware/verifyToken.js";
+
+const router = Router();
+
+
+router.post("/register", register);
+router.post("/login", login);
+router.post("/refresh", refreshAccessToken);
+router.post("/logout", logout);
+
+
+router.post("/admin/users", verifyToken, onlyAdmin, adminCreateUser);
+router.get("/admin/users", verifyToken, onlyAdmin, adminGetAllUsers);
+router.get("/admin/users/:id", verifyToken, onlyAdmin, adminGetUserById);
+router.put("/admin/users/:id/role", verifyToken, onlyAdmin, adminUpdateUserRole);
+router.put("/admin/users/:id/status", verifyToken, onlyAdmin, adminUpdateUserStatus);
+router.delete("/admin/users/:id", verifyToken, onlyAdmin, adminDeleteUser);
+
+export default router;
